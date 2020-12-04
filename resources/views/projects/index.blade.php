@@ -8,6 +8,7 @@
             <a class="btn btn-success" href="{{ route('projects.create') }}" title="Create a project"> <i class="fas fa-plus-circle fa-2x"></i> </a>
             <a class="btn btn-dark" href="{{ route('apiWithoutKey') }}" title="View Github Public Repository"> <i class="fab fa-github fa-2x"></i> </a>
             <a class="btn btn-dark" href="{{ route('apiWithKey') }}" title="View Dev.to List"> <i class="fab fa-dev fa-2x"></i> </a>
+            <a class="btn btn-dark" href="{{ route('createPagination') }}" title="View Dev.to List"> <i class="fas fa-file-alt fa-2x"></i> </a>
         </div>
     </div>
 </div>

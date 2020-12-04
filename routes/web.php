@@ -21,9 +21,8 @@ Route::get('/', function () {
 Route::prefix('projects')->group(function () {
     Route::get('apiwithoutkey', [ProjectController::class, 'apiWithoutKey'])->name('apiWithoutKey');
     Route::get('apiwithkey', [ProjectController::class, 'apiWithKey'])->name('apiWithKey');
+    Route::get('createpagination', [ProjectController::class, 'createPagination'])->name('createPagination');
 });
 
 
 Route::resource('projects', ProjectController::class);
-
-

@@ -8,6 +8,10 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Client;
 use PhpParser\Node\Expr\Exit_;
 
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
+
 class ProjectController extends Controller
 {
     /**
@@ -129,8 +133,8 @@ class ProjectController extends Controller
         $response = $client->request('GET', $url, [
             'verify'  => false,
         ]);
-
         $responseBody = json_decode($response->getBody());
+
 
         return view('projects.apiwithoutkey', compact('responseBody'));
     }
@@ -156,6 +160,48 @@ class ProjectController extends Controller
 
         $responseBody = json_decode($response->getBody());
 
-        return view('projects.apiwithkey', compact('responseBody'));
+        $onlyViews = [];
+
+
+        foreach ($responseBody as $views) {
+            array_push($onlyViews, $views->page_views_count, $views->title);
+        }
+        arsort($onlyViews);
+
+        return view('projects.apiwithkey', compact('responseBody', 'onlyViews'));
+    }
+
+    private function paginate($items, $perPage = 5, $page = null, $options = [])
+    {
+        $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
+        $items = $items instanceof Collection ? $items : Collection::make($items);
+
+        return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
+    }
+
+    public function createPagination() 
+    {
+        $client = new Client(); //GuzzleHttp\Client
+        $url = "https://api.github.com/users/kingsconsult/repos";
+
+
+        $response = $client->request('GET', $url, [
+            'verify'  => false,
+        ]);
+        $responseBody = json_decode($response->getBody());
+
+        
+        $responseArray = [];
+
+        foreach ($responseBody as $key => $views) {
+            $array = array('id' => $key, 'name' => $views->name, 'url' => $views->url, 'created_at' => $views->created_at);
+            array_push($responseArray, $array);
+        }
+
+        $githubRepo = $this->paginate($responseArray)->setPath('/projects/createpagination');
+
+        return view('projects.createpagination', compact('githubRepo'))
+        ->with('i', (request()->input('page', 1) - 1) * 5)
+        ;
     }
 }
